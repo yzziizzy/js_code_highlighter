@@ -1,0 +1,30 @@
+.keyword {
+	color: red;
+}
+
+.punct{
+	color: lime;
+}
+
+.string{
+	color: #cccc00;
+}
+.number{
+	color: #881133;
+}
+.ident{
+	color: blue;
+}
+.type{
+	color: magenta;
+}
+.preproc {
+	color: navy;
+}
+
+
+
+
+.js-code-highlight-root {
+	background-color: #888888;
+}
