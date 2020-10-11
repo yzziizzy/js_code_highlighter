@@ -17,4 +17,5 @@ Who cares? Discord takes a gig of ram to do what IRC clients did in a few K and 
 # Usage
 * `<pre> your code </pre>` Will turn into a highlighted block element with line numbers.
 * `<ipre> your code </ipre>` Will turn into a single-line highlighted inline-block element without line numbers.
+* `<ipre ln="5"> your code </ipre>` Will turn into a single-line highlighted inline-block element with a line number of 5.
 

@@ -1,30 +1,45 @@
 .keyword {
-	color: red;
+	color: #A3CCF7;
 }
-
 .punct{
-	color: lime;
+	color: #B1EDEC;
 }
-
-.string{
-	color: #cccc00;
+.string, .charlit {
+	color: #55EB54;
 }
-.number{
-	color: #881133;
+.number {
+	color: #F7BA7E;
 }
-.ident{
-	color: blue;
+.ident {
+	color: #E0E0E0;
 }
-.type{
-	color: magenta;
+.type {
+	color: #A3CCF7;
 }
 .preproc {
-	color: navy;
+	color: #66aadd;
 }
-
-
+.comment {
+	color: #787D31
+}
 
 
 .js-code-highlight-root {
-	background-color: #888888;
+	background-color: #3E3E3E;
+	border: 1px solid black;
+	font-size: .9em;
+}
+
+.multiline {
+	padding: 10px 5px;
+}
+.line-nums {
+	padding-right: 5px;
+	border-right: 1px solid black;
+	background-color: #222222;
+	color: #ccccdd;
+	text-align: right;
+}
+.line {
+	line-height: 1.3em;
 }
