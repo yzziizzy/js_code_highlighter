@@ -16,6 +16,7 @@ var gopts = {
 	multilineSelector: "pre",
 	inlineSelector: "ipre, c",
 	failsafe: 10000,
+	defaultLanguage: 'c',
 };
 
 JSCodeHighlight = function(o) {
@@ -26,27 +27,27 @@ JSCodeHighlight = function(o) {
 
 
 // Highlighting Rules
-// (?<O>) is the captured group.
+// The only non-anonymous group is the one captured
 // name: "foo" will be added as a css class to the element.
 var rule_list = {
+	none: [],
 	c: [
-		{name: 'whitespace', re: /^(?<O>\s+)/ },
-		{name: 'preproc', re:  /^(?<O>#[a-zA-Z]+.*)(\n|$)/ },
-		{name: 'comment', re:  /^(?<O>\/\/.*)(\n|$)/ },
-		{name: 'comment', re:  /^(?<O>\/\*.*\*\/)/ms },
-		{name: 'type', re:    /^(?<O>(const|extern|int|inline|restrict|void|volatile|float|char|double|unsigned|signed|short|long|static|struct|union|enum|auto|register|[a-z_0-9]+_t)\**)(\W|$)/ },
-		{name: 'keyword', re: /^(?<O>if|for|else|while|do|switch|return|break|continue|default|case|goto|typedef|sizeof|offsetof)(\W|$)/ },
-		{name: 'string', re:   /^(?<O>"([^"]*|\\.)*")/ },
-		{name: 'charlit', re:   /^(?<O>'([^']*|\\.)*')/ },
-		{name: 'number', re:   /^(?<O>[-+]?[0-9]*\.?[0-9]+e?[0-9]*)/ },
-		{name: 'number', re:   /^(?<O>[-+]?0x[0-9a-fA-F]*\.?[0-9a-fA-F]+e?[0-9a-fA-F]*)/ },
-		{name: 'punct', re:    /^(?<O>(&gt;|&lt;)+|[\(\)\[\]{}\|\.,\+=\-?&\/\\\*^%:;!~]+)/ },
-		{name: 'ident', re:    /^((?<O>[a-zA-Z_][a-zA-Z_0-9]*)\W)/ },
+		{name: 'whitespace', re: /^(\s+)/ },
+		{name: 'preproc', re:  /^(#[a-zA-Z]+.*)(?:\n|$)/ },
+		{name: 'comment', re:  /^(\/\/.*)(\n|$)/ },
+		{name: 'comment', re:  /^(\/\*(?:.|\n)*\*\/)/m },
+		{name: 'type', re:    /^((?:const|extern|int|inline|restrict|void|volatile|float|char|double|unsigned|signed|short|long|static|struct|union|enum|auto|register|[a-z_0-9]+_t)\**)(?:\W|$)/ },
+		{name: 'keyword', re: /^(if|for|else|while|do|switch|return|break|continue|default|case|goto|typedef|sizeof|offsetof)(?:\W|$)/ },
+		{name: 'string', re:   /^("(?:[^"]*|\\.)*")/ },
+		{name: 'charlit', re:   /^('(?:[^']*|\\.)*')/ },
+		{name: 'number', re:   /^([-+]?[0-9]*\.?[0-9]+e?[0-9]*)/ },
+		{name: 'number', re:   /^([-+]?0x[0-9a-fA-F]*\.?[0-9a-fA-F]+e?[0-9a-fA-F]*)/ },
+		{name: 'punct', re:    /^((?:&gt;|&lt;)+|[\(\)\[\]{}\|\.,\+=\-?&\/\\\*^%:;!~]+)/ },
+		{name: 'ident', re:    /^(?:([a-zA-Z_][a-zA-Z_0-9]*)\W)/ },
 	],
 };
 
 window.addEventListener('load', function() {
-	
 	
 	// utility functions
 	
@@ -58,7 +59,7 @@ window.addEventListener('load', function() {
 		return i;
 	}
 	
-	function processLine(s) {
+	function processLine(s, rules) {
 		var k = {l: s};
 		var j = 0;
 		
@@ -104,7 +105,9 @@ window.addEventListener('load', function() {
 		var text = pre.innerHTML;
 		var lines = text.split("\n");
 		
-		var rules = rule_list['c'];
+		var lang = pre.getAttribute('lang') || gopts.defaultLanguage;
+		var rules = rule_list[lang];
+		if(!rules) rules = rule_list['none'];
 		
 		var start_line = parseFloat(pre.getAttribute('ln') || 1);
 		
@@ -129,7 +132,7 @@ window.addEventListener('load', function() {
 			var m = s.l.match(re);
 			if(m) {
 //  				console.log(cl, m);
-				var t = m.groups.O;
+				var t = m[1];
 				out_lines.push(
 					t.split('\n')
 						.map(function(x) { return '<span class="'+cl+'">'+x+'</span>'})
@@ -149,7 +152,7 @@ window.addEventListener('load', function() {
 		// all this messy joining and splitting is to handle multi-line matches like comments
 		//   but also put each code line inside its own span
 		var txt = out_lines.join("\n");
-		var hl = processLine(txt);
+		var hl = processLine(txt, rules);
 		
 		out_lines = hl.join("").split("\n");
 		
@@ -209,6 +212,9 @@ window.addEventListener('load', function() {
 		var extra = "";
 		var src = pre.innerHTML.replace(/^\s+/, '').replace(/\s+$/, '')
 		
+		var lang = pre.getAttribute('lang') || gopts.defaultLanguage;
+		var rules = rule_list[lang];
+		
 		var line_num = pre.getAttribute('ln');
 		if(line_num) {
 			extra = '<span class="line-nums">'+line_num+'</span>';
@@ -220,7 +226,7 @@ window.addEventListener('load', function() {
 		parent.style.fontFamily = gopts.font;
 		parent.classList.add(gopts.rootClass);
 		parent.classList.add(gopts.inlineRootClass);
-		parent.innerHTML = extra + processLine(src).join('');
+		parent.innerHTML = extra + processLine(src, rules).join('');
 		
 		pre.replaceWith(parent);
 	}

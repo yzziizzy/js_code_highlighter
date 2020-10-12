@@ -20,6 +20,7 @@ Who cares? Discord takes a gig of ram to do what IRC clients did in a few K and 
 
 # Usage
 * `<pre> your code </pre>` Will turn into a highlighted block element with line numbers.
+* `<pre lang="c"> your code </pre>` Will use the "c" highlighter rules.
 * `<pre ln="5"> your code </pre>` Will turn into a highlighted block element with line numbers starting at 5.
 * `<pre title="foo.c"> your code </pre>` Adds a title bar with "foo.c"
 * `<ipre> your code </ipre>` Will turn into a single-line highlighted inline-block element without line numbers.
