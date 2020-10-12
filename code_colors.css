@@ -1,45 +1,47 @@
-.keyword {
-	color: #A3CCF7;
-}
-.punct{
-	color: #B1EDEC;
-}
-.string, .charlit {
-	color: #55EB54;
-}
-.number {
-	color: #F7BA7E;
-}
-.ident {
-	color: #E0E0E0;
-}
-.type {
-	color: #A3CCF7;
-}
-.preproc {
-	color: #66aadd;
-}
-.comment {
-	color: #787D31
-}
+
+/* highlighting colors */
+.keyword { color: #A3CCF7; }
+.punct{ color: #B1EDEC; }
+.string, .charlit { color: #55EB54; }
+.number { color: #F7BA7E; }
+.ident { color: #E0E0E0; }
+.type { color: #A3CCF7; }
+.preproc { color: #66aadd; }
+.comment { color: #787D31; }
 
 
+
+/* decent default values */
 .js-code-highlight-root {
 	background-color: #3E3E3E;
 	border: 1px solid black;
 	font-size: .9em;
+	tab-size: 4;
 }
-
 .multiline {
-	padding: 10px 5px;
+	margin: 10px 0px;
+}
+.inline{
+	padding: 0px 5px;
+}
+.title {
+	border-bottom: 1px solid black;
+	background: linear-gradient(#999999, #666666);
+	color: #000000;
+	padding-left: 18px;
+	font-weight: bold;
 }
 .line-nums {
-	padding-right: 5px;
 	border-right: 1px solid black;
-	background-color: #222222;
-	color: #ccccdd;
+	background-color: #666666;
+	color: #CCCCDD;
 	text-align: right;
+	padding: 5px 5px 5px 5px;
+}
+.code-block {
+	padding: 5px 0 5px 5px;
 }
 .line {
 	line-height: 1.3em;
 }
+

@@ -8,9 +8,14 @@ var gopts = {
 	rootClass: 'js-code-highlight-root',
 	inlineRootClass: 'inline',
 	multilineRootClass: 'multiline',
+	titleClass: 'title',
 	lineClass: 'line',
 	gutterClass: 'line-nums',
+	codeBlockClass: 'code-block',
 	font: "Courier New",
+	multilineSelector: "pre",
+	inlineSelector: "ipre, c",
+	failsafe: 10000,
 };
 
 JSCodeHighlight = function(o) {
@@ -25,17 +30,18 @@ JSCodeHighlight = function(o) {
 // name: "foo" will be added as a css class to the element.
 var rule_list = {
 	c: [
-		{name: 'whitespace', re: /^(?<O>\s+)/},
-		{name: 'preproc', re:  /^(?<O>#[a-zA-Z]+.*)\n/},
-		{name: 'comment', re:  /^(?<O>\/\/.*)\n/},
-		{name: 'comment', re:  /^(?<O>\/\*.*\*\/)/ms},
-		{name: 'type', re:    /^(?<O>(const|extern|int|inline|restrict|void|volatile|float|char|double|unsigned|signed|short|long|static|struct|union|enum|auto|register|[a-z_0-9]+_t)\**)\W/},
-		{name: 'keyword', re: /^(?<O>if|for|else|while|do|switch|return|break|continue|default|case|goto|typedef|sizeof|offsetof)\W/},
-		{name: 'string', re:   /^(?<O>"([^\\]*|\\.)+")/},
-		{name: 'charlit', re:   /^(?<O>'([^\\]*|\\.)+')/},
-		{name: 'number', re:   /^(?<O>[-+]?[0-9]*\.?[0-9]+e?[0-9]*)/},
-		{name: 'punct', re:    /^(?<O>(&gt;|&lt;)+|[\(\)\[\]{}\|\.,\+=\-?&\/\\\*^%:;!~]+)/},
-		{name: 'ident', re:    /^((?<O>[a-zA-Z_][a-zA-Z_0-9]*)\W)/},
+		{name: 'whitespace', re: /^(?<O>\s+)/ },
+		{name: 'preproc', re:  /^(?<O>#[a-zA-Z]+.*)(\n|$)/ },
+		{name: 'comment', re:  /^(?<O>\/\/.*)(\n|$)/ },
+		{name: 'comment', re:  /^(?<O>\/\*.*\*\/)/ms },
+		{name: 'type', re:    /^(?<O>(const|extern|int|inline|restrict|void|volatile|float|char|double|unsigned|signed|short|long|static|struct|union|enum|auto|register|[a-z_0-9]+_t)\**)(\W|$)/ },
+		{name: 'keyword', re: /^(?<O>if|for|else|while|do|switch|return|break|continue|default|case|goto|typedef|sizeof|offsetof)(\W|$)/ },
+		{name: 'string', re:   /^(?<O>"([^"]*|\\.)*")/ },
+		{name: 'charlit', re:   /^(?<O>'([^']*|\\.)*')/ },
+		{name: 'number', re:   /^(?<O>[-+]?[0-9]*\.?[0-9]+e?[0-9]*)/ },
+		{name: 'number', re:   /^(?<O>[-+]?0x[0-9a-fA-F]*\.?[0-9a-fA-F]+e?[0-9a-fA-F]*)/ },
+		{name: 'punct', re:    /^(?<O>(&gt;|&lt;)+|[\(\)\[\]{}\|\.,\+=\-?&\/\\\*^%:;!~]+)/ },
+		{name: 'ident', re:    /^((?<O>[a-zA-Z_][a-zA-Z_0-9]*)\W)/ },
 	],
 };
 
@@ -58,9 +64,21 @@ window.addEventListener('load', function() {
 		
 		var ol = []
 		while(k.l.length > 0) {
+			if(j++ > gopts.failsafe) return;
 			
+			// preserve tags
+			var m = k.l.match(/^<\/?[^>]*>/);
+			if(m) {
+				ol.push(m[0]);
+				console.log(m[0]);
+				k.l = k.l.slice(m[0].length);
+				continue;
+			}
+			
+			// process the rules
 			var br = false;
 			for(var r of rules) {
+				if(j++ > gopts.failsafe) return;
 				if(eat(k, r.re, r.name, ol)) {
 					br = true;
 					break;
@@ -80,13 +98,15 @@ window.addEventListener('load', function() {
 	
 	// multiline pre's
 	
-	var pres = document.querySelectorAll('pre');
+	var pres = document.querySelectorAll(gopts.multilineSelector);
 	
 	for(var pre of pres) {
 		var text = pre.innerHTML;
 		var lines = text.split("\n");
 		
 		var rules = rule_list['c'];
+		
+		var start_line = parseFloat(pre.getAttribute('ln') || 1);
 		
 		// find out how many tabs to trim on the left
 		var least_tabs = 999999999;
@@ -139,35 +159,43 @@ window.addEventListener('load', function() {
 		parent.classList.add(gopts.multilineRootClass);
 		parent.style.display = "block";
 		parent.style.position = "relative";
+		
+		var title = pre.getAttribute('title')
+		if(title) {
+			var tn = document.createElement('div');
+			tn.classList.add(gopts.titleClass);
+			tn.innerHTML = title;
+			parent.append(tn);
+		}
+		
 		var line_nums = document.createElement('span');
 		line_nums.classList.add(gopts.gutterClass);
 		line_nums.style.display = "inline-block";
 		line_nums.style.fontFamily = gopts.font;
 		line_nums.style.whiteSpace = "pre";
 		line_nums.style.userSelect = "none";
-		for(var i = 1; i <= lines.length; i++) {
+		for(var i = 0; i < lines.length; i++) {
 			var nl = document.createElement('span');
 			nl.classList.add(gopts.lineClass);
-			nl.innerHTML = i + "\n";
-			line_nums.appendChild(nl);
+			nl.innerHTML = (i + start_line) + "\n";
+			line_nums.append(nl);
 		}
 		
 		
 		var code_block = document.createElement('div');
-		code_block.style.position = "absolute";
+		code_block.classList.add(gopts.codeBlockClass);
 		code_block.style.display = "inline-block";
-		code_block.style.left = "40px";
 		code_block.style.fontFamily = gopts.font;
 		code_block.style.whiteSpace = "pre";
 		for(var l of out_lines) {
 			var nl = document.createElement('span');
 			nl.classList.add(gopts.lineClass);
 			nl.innerHTML = l + "\n";
-			code_block.appendChild(nl);
+			code_block.append(nl);
 		}
 		
-		parent.appendChild(line_nums);
-		parent.appendChild(code_block);
+		parent.append(line_nums);
+		parent.append(code_block);
 		pre.replaceWith(parent)
 		
 	} 
@@ -176,7 +204,7 @@ window.addEventListener('load', function() {
 	
 	// inline pre's
 	
-	var pres = document.querySelectorAll('ipre');
+	var pres = document.querySelectorAll(gopts.inlineSelector);
 	for(var pre of pres) {
 		var extra = "";
 		var src = pre.innerHTML.replace(/^\s+/, '').replace(/\s+$/, '')
