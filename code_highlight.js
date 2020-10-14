@@ -40,12 +40,29 @@ var rule_list = {
 		{name: 'keyword', re: /^(if|for|else|while|do|switch|return|break|continue|default|case|goto|typedef|sizeof|offsetof)(?:\W|$)/ },
 		{name: 'string', re:   /^("(?:[^"]*|\\.)*")/ },
 		{name: 'charlit', re:   /^('(?:[^']*|\\.)*')/ },
-		{name: 'number', re:   /^([-+]?[0-9]*\.?[0-9]+e?[0-9]*)/ },
-		{name: 'number', re:   /^([-+]?0x[0-9a-fA-F]*\.?[0-9a-fA-F]+e?[0-9a-fA-F]*)/ },
+		{name: 'number', re:   /^([-+]?[0-9]*\.?[0-9]+e?[0-9]*[ulfb]*)/i },
+		{name: 'number', re:   /^([-+]?0x[0-9a-fA-F]*\.?[0-9a-fA-F]+e?[0-9a-fA-F]*[ulfb]*)/i },
 		{name: 'punct', re:    /^((?:&gt;|&lt;)+|[\(\)\[\]{}\|\.,\+=\-?&\/\\\*^%:;!~]+)/ },
-		{name: 'ident', re:    /^(?:([a-zA-Z_][a-zA-Z_0-9]*)\W)/ },
+		{name: 'ident', re:    /^(?:([a-zA-Z_][a-zA-Z_0-9]*)(?:\W|$))/ },
 	],
+	asm: [ // intel style
+		{name: 'whitespace', re: /^(\s+)/ },
+		{name: 'comment', re:  /^(;.*)(\n|$)/ },
+		{name: 'keyword', re: /^([QD]?WORD|offset|flat|ptr|word|quad|string)(?:\W|$)/i },
+		{name: 'label', re:  /^([a-z_][a-z0-9_]*:)/i },
+		{name: 'label', re:  /^(\.[a-z_][a-z0-9_]*)/i },
+		{name: 'register', re: /^(RAX|RCX|RDX|RBX|RSP|RBP|RSI|RDI|EAX|ECX|EDX|EBX|ESP|EBP|ESI|EDI|AX|CX|DX|BX|SP|BP|SI|DI|AH|AL|CH|CL|DH|DL|BH|BL|SPL|BPL|SIL|DIL|R8|R9|R10|R11|R12|R13|R14|R15|R8B|R9B|R10B|R11B|R12B|R13B|R14B|R15B|R8W|R9W|R10W|R11W|R12W|R13W|R14W|R15W|R8D|R9D|R10D|R11D|R12D|R13D|R14D|R15D|EFLAGS|FLAGS|IP|EIP|RIP)(?:\W|$)/i },
+		{name: 'simd-register', re: /^([xyz]?mm\d\d?)(?:\W|$)/i },
+		{name: 'string', re:   /^("(?:[^"]*|\\.)*")/ },
+		{name: 'number', re:   /^([-+]?0x[0-9a-fA-F]*\.?[0-9a-fA-F]+e?[0-9a-fA-F]*[ulfb]*)/i },
+		{name: 'number', re:   /^([-+]?[0-9]*\.?[0-9]+e?[0-9]*[ulfb]*)/i },
+		{name: 'punct', re:    /^([\[\]\.,\+\-:]+)/ },
+		{name: 'ident', re:    /^([a-zA-Z_][a-zA-Z_0-9]*)(?:\W|$)/ },
+
+	]
 };
+
+
 
 window.addEventListener('load', function() {
 	
@@ -59,6 +76,22 @@ window.addEventListener('load', function() {
 		return i;
 	}
 	
+	function eat(s, re, cl, out_lines) {
+		var m = s.l.match(re);
+		if(m) {
+//  				console.log(cl, m);
+			var t = m[1];
+			out_lines.push(
+				t.split('\n')
+					.map(function(x) { return '<span class="'+cl+'">'+x+'</span>'})
+					.join('\n')
+			);
+			s.l = s.l.slice(t.length);
+			return true;
+		}
+		return false;
+	}
+	
 	function processLine(s, rules) {
 		var k = {l: s};
 		var j = 0;
@@ -69,6 +102,16 @@ window.addEventListener('load', function() {
 			
 			// preserve tags
 			var m = k.l.match(/^<\/?[^>]*>/);
+			if(m) {
+				ol.push(m[0]);
+				console.log(m[0]);
+				k.l = k.l.slice(m[0].length);
+				continue;
+			}
+			
+			
+			// preserve &..;
+			var m = k.l.match(/^&[a-z]{1,4};/);
 			if(m) {
 				ol.push(m[0]);
 				console.log(m[0]);
@@ -127,22 +170,6 @@ window.addEventListener('load', function() {
 		}
 		
 		lines = lines.slice(0, -trailing_empty+1);
-		
-		function eat(s, re, cl, out_lines) {
-			var m = s.l.match(re);
-			if(m) {
-//  				console.log(cl, m);
-				var t = m[1];
-				out_lines.push(
-					t.split('\n')
-						.map(function(x) { return '<span class="'+cl+'">'+x+'</span>'})
-						.join('\n')
-				);
-				s.l = s.l.slice(t.length);
-				return true;
-			}
-			return false;
-		}
 		
 		var out_lines = [];
 		for(var l of lines) { 
@@ -214,6 +241,7 @@ window.addEventListener('load', function() {
 		
 		var lang = pre.getAttribute('lang') || gopts.defaultLanguage;
 		var rules = rule_list[lang];
+		if(!rules) rules = rule_list['none'];
 		
 		var line_num = pre.getAttribute('ln');
 		if(line_num) {
