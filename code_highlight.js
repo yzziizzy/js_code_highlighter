@@ -17,6 +17,7 @@ var gopts = {
 	inlineSelector: "ipre, c",
 	failsafe: 10000,
 	defaultLanguage: 'c',
+	languageClassPrefix: 'lang-',
 };
 
 JSCodeHighlight = function(o) {
@@ -48,15 +49,16 @@ var rule_list = {
 	asm: [ // intel style
 		{name: 'whitespace', re: /^(\s+)/ },
 		{name: 'comment', re:  /^(;.*)(\n|$)/ },
-		{name: 'keyword', re: /^([QD]?WORD|offset|flat|ptr|word|quad|string)(?:\W|$)/i },
-		{name: 'label', re:  /^([a-z_][a-z0-9_]*:)/i },
-		{name: 'label', re:  /^(\.[a-z_][a-z0-9_]*)/i },
-		{name: 'register', re: /^(RAX|RCX|RDX|RBX|RSP|RBP|RSI|RDI|EAX|ECX|EDX|EBX|ESP|EBP|ESI|EDI|AX|CX|DX|BX|SP|BP|SI|DI|AH|AL|CH|CL|DH|DL|BH|BL|SPL|BPL|SIL|DIL|R8|R9|R10|R11|R12|R13|R14|R15|R8B|R9B|R10B|R11B|R12B|R13B|R14B|R15B|R8W|R9W|R10W|R11W|R12W|R13W|R14W|R15W|R8D|R9D|R10D|R11D|R12D|R13D|R14D|R15D|EFLAGS|FLAGS|IP|EIP|RIP)(?:\W|$)/i },
+		{name: 'keyword', re: /^((?:(?:[qd]?word|byte)\s+(?:ptr))|(offset (?:flat)?))(?:\W|$)/i },
+		{name: 'directive', re:  /^(\.(?:align|ascii|bcd|bss|[248]?byte|comm|data|double|even|ext|file|float|glabl|group|hidden|ident|lcomm|local|long|popsection|previous|pushsection|quad|rel|section|set|size|skip|sleb128|string|symbolic|tbss|tcomm|tdata|text|type|uleb128|value|weak|zero))/i },
+		{name: 'label', re:  /^(\.?[a-z_][a-z0-9_]*:)/i },
+		{name: 'label', re:  /^(\.[a-z_][a-z0-9_]*:?)/i },
+		{name: 'register', re: /^([RE]?[ABCD]X|[RE]?[SBI]P|[RE]?[SD]I|[ABCD][HL]|[SB]PL|[SD]IL|R[89][BWD]?|R1[0-5][BWD]?|EFLAGS|FLAGS)(?:\W|$)/i },
 		{name: 'simd-register', re: /^([xyz]?mm\d\d?)(?:\W|$)/i },
 		{name: 'string', re:   /^("(?:[^"]*|\\.)*")/ },
-		{name: 'number', re:   /^([-+]?0x[0-9a-fA-F]*\.?[0-9a-fA-F]+e?[0-9a-fA-F]*[ulfb]*)/i },
+		{name: 'number', re:   /^([-+]?0[xb][0-9a-fA-F]*\.?[0-9a-fA-F]+e?[0-9a-fA-F]*[ulfb]*)/i },
 		{name: 'number', re:   /^([-+]?[0-9]*\.?[0-9]+e?[0-9]*[ulfb]*)/i },
-		{name: 'punct', re:    /^([\[\]\.,\+\-:]+)/ },
+		{name: 'punct', re:    /^([\[\],\+\-:]+)/ },
 		{name: 'ident', re:    /^([a-zA-Z_][a-zA-Z_0-9]*)(?:\W|$)/ },
 
 	]
@@ -187,6 +189,7 @@ window.addEventListener('load', function() {
 		var parent = document.createElement('div');
 		parent.classList.add(gopts.rootClass);
 		parent.classList.add(gopts.multilineRootClass);
+		parent.classList.add(gopts.languageClassPrefix + lang);
 		parent.style.display = "block";
 		parent.style.position = "relative";
 		
@@ -254,6 +257,7 @@ window.addEventListener('load', function() {
 		parent.style.fontFamily = gopts.font;
 		parent.classList.add(gopts.rootClass);
 		parent.classList.add(gopts.inlineRootClass);
+		parent.classList.add(gopts.languageClassPrefix + lang);
 		parent.innerHTML = extra + processLine(src, rules).join('');
 		
 		pre.replaceWith(parent);

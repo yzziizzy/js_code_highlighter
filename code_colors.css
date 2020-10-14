@@ -1,13 +1,24 @@
 
 /* highlighting colors */
-.keyword { color: #A3CCF7; }
-.punct{ color: #B1EDEC; }
-.string, .charlit { color: #55EB54; }
-.number { color: #F7BA7E; }
-.ident { color: #E0E0E0; }
-.type { color: #A3CCF7; }
-.preproc { color: #66aadd; }
-.comment { color: #787D31; }
+.lang-c .keyword { color: #A3CCF7; }
+.lang-c .punct{ color: #B1EDEC; }
+.lang-c .string, .lang-c .charlit { color: #55EB54; }
+.lang-c .number { color: #F7BA7E; }
+.lang-c .ident { color: #E0E0E0; }
+.lang-c .type { color: #A3CCF7; }
+.lang-c .preproc { color: #66aadd; }
+.lang-c .comment { color: #787D31; }
+
+.lang-asm .comment { color: #787D31; }
+.lang-asm .ident { color: #E0E0E0; }
+.lang-asm .keyword { color: #A3CCF7; }
+.lang-asm .string { color: #55EB54; }
+.lang-asm .number { color: #F7BA7E; }
+.lang-asm .punct{ color: #B1EDEC; }
+.lang-asm .directive{ color: #EDED43; }
+.lang-asm .register{ color: #B1ED43; }
+.lang-asm .simd-register{ color: #43EDB1; }
+.lang-asm .label {color: #66aadd; }
 
 
 
@@ -17,6 +28,7 @@
 	border: 1px solid black;
 	font-size: .9em;
 	tab-size: 4;
+	-moz-tab-size: 4;
 }
 .multiline {
 	margin: 10px 0px;
@@ -29,9 +41,9 @@
 	background: linear-gradient(#999999, #666666);
 	color: #000000;
 	padding-left: 18px;
-	font-weight: bold;
+	font-weight: bold;http://teraf.in/c_intro/1_hello.html
 }
-.line-nums {
+.line-nums {http://teraf.in/c_intro/1_hello.html
 	border-right: 1px solid black;
 	background-color: #666666;
 	color: #CCCCDD;
@@ -40,6 +52,7 @@
 }
 .code-block {
 	padding: 5px 0 5px 5px;
+	tab-size: 4;
 }
 .line {
 	line-height: 1.3em;
