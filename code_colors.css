@@ -15,7 +15,7 @@
 .lang-asm .string { color: #55EB54; }
 .lang-asm .number { color: #F7BA7E; }
 .lang-asm .punct{ color: #B1EDEC; }
-.lang-asm .directive{ color: #EDED43; }
+.lang-asm .directive { color: #EDED43; }
 .lang-asm .register{ color: #B1ED43; }
 .lang-asm .simd-register{ color: #43EDB1; }
 .lang-asm .label {color: #66aadd; }
@@ -30,30 +30,36 @@
 	tab-size: 4;
 	-moz-tab-size: 4;
 }
+
 .multiline {
 	margin: 10px 0px;
 }
+
 .inline{
 	padding: 0px 5px;
 }
+
 .title {
 	border-bottom: 1px solid black;
 	background: linear-gradient(#999999, #666666);
 	color: #000000;
 	padding-left: 18px;
-	font-weight: bold;http://teraf.in/c_intro/1_hello.html
+	font-weight: bold;
 }
-.line-nums {http://teraf.in/c_intro/1_hello.html
+
+.line-nums {
 	border-right: 1px solid black;
 	background-color: #666666;
 	color: #CCCCDD;
 	text-align: right;
 	padding: 5px 5px 5px 5px;
 }
+
 .code-block {
 	padding: 5px 0 5px 5px;
 	tab-size: 4;
 }
+
 .line {
 	line-height: 1.3em;
 }

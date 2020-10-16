@@ -14,9 +14,10 @@ var gopts = {
 	codeBlockClass: 'code-block',
 	font: "Courier New",
 	multilineSelector: "pre",
-	inlineSelector: "ipre, c",
+	inlineSelector: "ipre, c, m",
 	failsafe: 10000,
 	defaultLanguage: 'c',
+	defaultTagLanguage: { m: 'asm', c: 'c' },
 	languageClassPrefix: 'lang-',
 };
 
@@ -60,7 +61,6 @@ var rule_list = {
 		{name: 'number', re:   /^([-+]?[0-9]*\.?[0-9]+e?[0-9]*[ulfb]*)/i },
 		{name: 'punct', re:    /^([\[\],\+\-:]+)/ },
 		{name: 'ident', re:    /^([a-zA-Z_][a-zA-Z_0-9]*)(?:\W|$)/ },
-
 	]
 };
 
@@ -192,6 +192,10 @@ window.addEventListener('load', function() {
 		parent.classList.add(gopts.languageClassPrefix + lang);
 		parent.style.display = "block";
 		parent.style.position = "relative";
+		parent.style.overflowX = "auto";
+		parent.style.overflowY = "auto";
+		
+		pre.replaceWith(parent);
 		
 		var title = pre.getAttribute('title')
 		if(title) {
@@ -201,9 +205,14 @@ window.addEventListener('load', function() {
 			parent.append(tn);
 		}
 		
+		var scrollp = document.createElement('div');
+		scrollp.style.clear = "both";
+		parent.appendChild(scrollp);
+		
 		var line_nums = document.createElement('span');
 		line_nums.classList.add(gopts.gutterClass);
-		line_nums.style.display = "inline-block";
+		line_nums.style.display = "block";
+		line_nums.style.float = "left";
 		line_nums.style.fontFamily = gopts.font;
 		line_nums.style.whiteSpace = "pre";
 		line_nums.style.userSelect = "none";
@@ -213,13 +222,16 @@ window.addEventListener('load', function() {
 			nl.innerHTML = (i + start_line) + "\n";
 			line_nums.append(nl);
 		}
-		
+		scrollp.append(line_nums);
 		
 		var code_block = document.createElement('div');
 		code_block.classList.add(gopts.codeBlockClass);
-		code_block.style.display = "inline-block";
+		code_block.style.position = "absolute";
 		code_block.style.fontFamily = gopts.font;
 		code_block.style.whiteSpace = "pre";
+		code_block.style.left = line_nums.offsetWidth;
+		
+		getComputedStyle
 		for(var l of out_lines) {
 			var nl = document.createElement('span');
 			nl.classList.add(gopts.lineClass);
@@ -227,10 +239,7 @@ window.addEventListener('load', function() {
 			code_block.append(nl);
 		}
 		
-		parent.append(line_nums);
-		parent.append(code_block);
-		pre.replaceWith(parent)
-		
+		scrollp.append(code_block);
 	} 
 	
 	
